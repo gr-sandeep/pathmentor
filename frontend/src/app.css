@@ -1,0 +1,11 @@
+* {
+  font-family: "Outfit", sans-serif !important;
+}
+
+.login {
+  @apply bg-[url("./assets/bg.png")] bg-cover bg-no-repeat;
+}
+
+input {
+  @apply outline-none;
+}
