@@ -12,6 +12,7 @@ import Header from "./components/Header.jsx";
 import secureLocalStorage from "react-secure-storage";
 import Overview from "./components/Overview.jsx";
 import { ConfigProvider } from "antd";
+import Chat from "./components/Chat.jsx";
 
 const userInfo = secureLocalStorage.getItem("userInfo");
 
@@ -28,9 +29,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route
           path="/dashboard"
           element={
-            // <ProtectedRoute>
+            <ProtectedRoute>
               <Home />
-            // </ProtectedRoute>
+            </ProtectedRoute>
           }
         />
 
@@ -48,6 +49,15 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           element={
             <ProtectedRoute>
               <Progress />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/chat-with-ai"
+          element={
+            <ProtectedRoute>
+              <Chat />
             </ProtectedRoute>
           }
         />
