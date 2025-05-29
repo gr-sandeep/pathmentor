@@ -6,7 +6,7 @@ Include step-by-step instructions in a json format.In an array, provide the road
 **Sample Output Format:**
     - {
         roadmap_id: UUID GENERATED,
-        roadmap_steps: [
+        roadmap: [
             {
             phase: 1, 2, 3 ...,
             topic: ,
@@ -18,9 +18,6 @@ Include step-by-step instructions in a json format.In an array, provide the road
 
 Constraints: 
     Donot give include ' in the response`;
-
-
-export const 
 
 export const OPENAI_URL =
   import.meta.env.VITE_AZURE_OPENAI_CHAT_ENDPOINT +

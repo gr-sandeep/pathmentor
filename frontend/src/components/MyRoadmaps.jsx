@@ -17,13 +17,17 @@ import {
   IoIosArrowDropupCircle,
   IoIosArrowDropdownCircle,
 } from "react-icons/io";
+import { Timeline } from "antd";
+import RoadmapTimeline from "./RoadmapTimeline";
 
-const Progress = () => {
+const MyRoadmaps = () => {
   const [roadmaps, setRoadmaps] = useState([]);
   const [viewModal, setviewModal] = useState(false);
   const [currentRoadmap, setcurrentRoadmap] = useState([]);
   const [selectedPhases, setselectedPhases] = useState(new Set());
   const [deleteModal, setdeleteModal] = useState(false);
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 5 });
+
 
   const handleSelectPhase = (id) => {
     const phases = new Set(selectedPhases);
@@ -74,39 +78,58 @@ const Progress = () => {
       title: "S. No",
       dataIndex: "id",
       key: "id",
-      render: (text, record, index) => <span>{index + 1}</span>,
+      render: (text, record, index) => (
+        <span>
+          {index + 1 + (pagination.current - 1) * pagination.pageSize}
+        </span>
+      ),
     },
     {
       title: "Role",
       dataIndex: "role",
       key: "role",
+      render: (text) => text ? text.charAt(0).toUpperCase() + text.slice(1).toLowerCase() : '',
+      sorter: (a, b) => (a.role || '').localeCompare(b.role || ''),
     },
     {
       title: "Complexity",
       dataIndex: "complexity",
-      render: (text, record) => <span>{text}</span>,
+      key: "complexity",
+
+      render: (text) => text ? text.charAt(0).toUpperCase() + text.slice(1).toLowerCase() : '',
+      sorter: (a, b) => (a.complexity || '').localeCompare(b.complexity || ''),
     },
     {
       title: "No of Phases",
       dataIndex: "numberofPhases",
+      key: "numberofPhases",
+
       render: (text, record) => <span>{text + " phases"}</span>,
     },
     {
       title: "Duration in Months",
       dataIndex: "durationInMonths",
+      key: "durationInMonths",
       render: (text, record) => <span>{text + " months"}</span>,
     },
     {
       title: "Created At",
       dataIndex: "createdAt",
       key: "createdAt",
-      render: (text, record) => (
-        <span>{moment(record).format("DD-MM-YYYY, hh:mm:ss a")}</span>
-      ),
+      render: (text) => {
+        const date = text?.toDate ? text.toDate() : text;
+        return <span>{moment(date).format("DD-MM-YYYY, hh:mm:ss a")}</span>;
+      },
+      sorter: (a, b) => {
+        const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
+        const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
+        return dateA - dateB;
+      },
     },
     {
       title: "Action",
       dataIndex: "action",
+      key: "action",
       render: (text, record) => (
         <div
           className="flex items-center gap-4"
@@ -128,91 +151,39 @@ const Progress = () => {
           />
         </div>
       ),
-      key: "view",
     },
   ];
 
   return (
-    <div>
-      <Table
+    <>
+      <Table className="overflow-scroll p-10"
         dataSource={roadmaps}
         columns={columns}
         pagination={{
-          position: ["bottomcenter"],
+          position: ["bottomCenter"],
+          current: pagination.current,
+          pageSize: pagination.pageSize,
           total: roadmaps?.length || 0,
+
+          pageSizeOptions: [5, 10, 20],
+          onChange: (page, pageSize) =>
+            setPagination({ current: page, pageSize }),
+          showSizeChanger: true,
         }}
       />
 
       <Modal
-        width="60%"
+        className="min-w-1/2"
         open={viewModal}
         onCancel={() => setviewModal(false)}
         footer={null}
         title={currentRoadmap[0]?.role?.toUpperCase()}
-      >
-        <div className="flex flex-col gap-10 w-full p-5">
-          {currentRoadmap[0]?.roadmap?.map((phase) => (
-            <div
-              className="border-2 p-4 border-gray-200 shadow-md rounded-md  flex flex-col items-center justify-between"
-              key={phase.phase}
-            >
-              <div
-                onClick={() => handleSelectPhase(phase.phase)}
-                className="flex items-center justify-between w-full cursor-pointer"
-              >
-                <p className="text-lg">
-                  Phase {phase.phase} - {phase.topic}
-                </p>
-                {selectedPhases.has(phase.phase) ? (
-                  <IoIosArrowDropupCircle
-                    className="text-[#535353]"
-                    fontSize={20}
-                  />
-                ) : (
-                  <IoIosArrowDropdownCircle
-                    className="text-[#535353]"
-                    fontSize={20}
-                  />
-                )}
-              </div>
-
-              {selectedPhases.has(phase.phase) && (
-                <div className="flex flex-col w-full p-3 gap-3">
-                  <div className="flex flex-wrap gap-1">
-                    <span className="font-semibold pr-2">Topics:</span>
-                    {phase?.subtopics?.map((topic) => (
-                      <span>{topic + ","}</span>
-                    ))}
-                  </div>
-                  <p>
-                    <span className="font-semibold pr-2">
-                      Estimated Duration:
-                    </span>
-                    {phase?.estimated_duration_weeks} weeks
-                  </p>
-                  <div>
-                    <span className="font-semibold">Resources:</span>
-                    <div className="flex flex-wrap gap-2">
-                      {phase?.resources?.map((res, index) => (
-                        <a
-                          key={index}
-                          className="text-blue-600 hover:scale-105 text-sm border rounded-md px-2 py-0.5 cursor-pointer"
-                          href={res.url}
-                          target="_blank"
-                        >
-                          {res.name}
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+      ><div className="pt-10"></div>
+        <RoadmapTimeline roadmap={currentRoadmap[0]} />
       </Modal>
 
       <Modal
+        centered
         open={deleteModal}
         onCancel={() => setdeleteModal(false)}
         footer={null}
@@ -234,8 +205,8 @@ const Progress = () => {
           </Button>
         </div>
       </Modal>
-    </div>
+    </>
   );
 };
 
-export default Progress;
+export default MyRoadmaps;
