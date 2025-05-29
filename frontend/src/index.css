@@ -1,39 +1,38 @@
 @import "tailwindcss";
 
 @keyframes fade {
-    0% {
-        opacity: 0.2;
-    }
+  0% {
+    opacity: 0.2;
+  }
 
-    50% {
-        opacity: 1;
-    }
+  50% {
+    opacity: 1;
+  }
 
-    100% {
-        opacity: 0.2;
-    }
+  100% {
+    opacity: 0.2;
+  }
 }
 
 .animate-fade {
-    animation: fade 1.5s infinite;
+  animation: fade 1.5s infinite;
 }
 
 .ant-timeline .ant-timeline-item {
-    padding-bottom: 40px;
-    margin-left: -300px;
+  padding-bottom: 40px;
+  margin-left: -300px;
 }
 
-
 ::-webkit-scrollbar {
-    width: 5px !important;
-    height: 5px !important;
+  width: 5px !important;
+  height: 5px !important;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #e5e7eb;
-    border-radius: 4px;
+  background: #e5e7eb;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-track {
-    background: transparent;
+  background: transparent;
 }
