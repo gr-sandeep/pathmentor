@@ -34,14 +34,6 @@ ReactDOM.createRoot(document.getElementById("root")).render(
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Home />
-              </ProtectedRoute>
-            }
-          />
 
           <Route
             path="/my-profile"

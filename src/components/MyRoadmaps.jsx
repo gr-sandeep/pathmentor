@@ -23,11 +23,11 @@ import RoadmapTimeline from "./RoadmapTimeline";
 const MyRoadmaps = () => {
   const [roadmaps, setRoadmaps] = useState([]);
   const [viewModal, setviewModal] = useState(false);
+  const [loading, setloading] = useState(false);
   const [currentRoadmap, setcurrentRoadmap] = useState([]);
   const [selectedPhases, setselectedPhases] = useState(new Set());
   const [deleteModal, setdeleteModal] = useState(false);
   const [pagination, setPagination] = useState({ current: 1, pageSize: 5 });
-
 
   const handleSelectPhase = (id) => {
     const phases = new Set(selectedPhases);
@@ -47,16 +47,25 @@ const MyRoadmaps = () => {
   }, []);
 
   const fetchRoadmaps = async () => {
+    setloading(true);
     try {
       const querySnapshot = await getDocs(collection(db, "roadmaps"));
-      const roadmapsData = querySnapshot.docs.map((doc) => ({
+      let roadmapsData = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
+      // Sort by createdAt descending (latest first)
+      roadmapsData = roadmapsData.sort((a, b) => {
+        const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
+        const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
+        return dateB - dateA;
+      });
       setRoadmaps(roadmapsData);
       secureLocalStorage.setItem("allRoadmaps", roadmapsData);
     } catch (error) {
       console.error("Error fetching Roadmaps: ", error);
+    } finally {
+      setloading(false);
     }
   };
 
@@ -88,16 +97,18 @@ const MyRoadmaps = () => {
       title: "Role",
       dataIndex: "role",
       key: "role",
-      render: (text) => text ? text.charAt(0).toUpperCase() + text.slice(1).toLowerCase() : '',
-      sorter: (a, b) => (a.role || '').localeCompare(b.role || ''),
+      render: (text) =>
+        text ? text.charAt(0).toUpperCase() + text.slice(1).toLowerCase() : "",
+      sorter: (a, b) => (a.role || "").localeCompare(b.role || ""),
     },
     {
       title: "Complexity",
       dataIndex: "complexity",
       key: "complexity",
 
-      render: (text) => text ? text.charAt(0).toUpperCase() + text.slice(1).toLowerCase() : '',
-      sorter: (a, b) => (a.complexity || '').localeCompare(b.complexity || ''),
+      render: (text) =>
+        text ? text.charAt(0).toUpperCase() + text.slice(1).toLowerCase() : "",
+      sorter: (a, b) => (a.complexity || "").localeCompare(b.complexity || ""),
     },
     {
       title: "No of Phases",
@@ -121,8 +132,12 @@ const MyRoadmaps = () => {
         return <span>{moment(date).format("DD-MM-YYYY, hh:mm:ss a")}</span>;
       },
       sorter: (a, b) => {
-        const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
-        const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
+        const dateA = a.createdAt?.toDate
+          ? a.createdAt.toDate()
+          : new Date(a.createdAt);
+        const dateB = b.createdAt?.toDate
+          ? b.createdAt.toDate()
+          : new Date(b.createdAt);
         return dateA - dateB;
       },
     },
@@ -156,15 +171,16 @@ const MyRoadmaps = () => {
 
   return (
     <>
-      <Table className="overflow-scroll p-10"
+      <Table
+        className="overflow-scroll p-10"
         dataSource={roadmaps}
         columns={columns}
+        loading={loading}
         pagination={{
           position: ["bottomCenter"],
           current: pagination.current,
           pageSize: pagination.pageSize,
           total: roadmaps?.length || 0,
-
           pageSizeOptions: [5, 10, 20],
           onChange: (page, pageSize) =>
             setPagination({ current: page, pageSize }),
@@ -178,7 +194,8 @@ const MyRoadmaps = () => {
         onCancel={() => setviewModal(false)}
         footer={null}
         title={currentRoadmap[0]?.role?.toUpperCase()}
-      ><div className="pt-10"></div>
+      >
+        <div className="pt-10"></div>
         <RoadmapTimeline roadmap={currentRoadmap[0]} />
       </Modal>
 

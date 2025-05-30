@@ -36,3 +36,11 @@
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
+.ant-menu-item {
+  font-size: 15px !important;
+}
+
+.ant-menu-item-icon {
+  font-size: 20px !important;
+}

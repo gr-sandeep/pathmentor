@@ -31,7 +31,7 @@ const Home = () => {
   // }, [])
 
   useEffect(() => {
-    if (roadmap && roadmapRef.current) {
+    if (roadmap.length>0 && roadmapRef.current) {
       roadmapRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }, [roadmap]);
